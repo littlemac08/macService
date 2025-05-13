@@ -10,12 +10,44 @@ const handler = createHandler({
 
 // 서버 시작 (0.0.0.0으로 외부 접속 허용)
 http.createServer((req, res) => {
-  handler(req, res, err => {
-    res.statusCode = 404;
-    res.end('no such location');
-  });
+  if (req.method === 'POST' && req.url === '/mcp') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      let question;
+      try {
+        question = JSON.parse(body).question;
+      } catch (e) {
+        res.writeHead(400);
+        res.end('Invalid JSON');
+        return;
+      }
+      if (!question) {
+        res.writeHead(400);
+        res.end('질문이 필요합니다. { "question": "..." }');
+        return;
+      }
+      // 라즈베리파이에서 ask-mcp.js 실행
+      const sshCmd = `ssh casnice@221.146.185.171 'cd ~/macService/mcp && node ask-mcp.js "${question}"'`;
+      exec(sshCmd, (err, stdout, stderr) => {
+        if (err) {
+          res.writeHead(500);
+          res.end('MCP 실행 오류: ' + err.message);
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('MCP 실행 결과:\n' + stdout);
+      });
+    });
+  } else {
+    handler(req, res, err => {
+      res.statusCode = 404;
+      res.end('no such location');
+    });
+  }
 }).listen(7777, () => {
   console.log('✅ Webhook server running at http://0.0.0.0:7777/webhook');
+  console.log('✅ MCP Trigger endpoint running at http://0.0.0.0:7777/mcp');
 });
 
 // 푸시 이벤트 처리
