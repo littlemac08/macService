@@ -1,6 +1,7 @@
 const http = require('http');
 const createHandler = require('github-webhook-handler');
 const { exec } = require('child_process');
+require('dotenv').config();
 
 // GitHub Webhook의 path 및 secret
 const handler = createHandler({
