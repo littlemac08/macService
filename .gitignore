@@ -1,0 +1,5 @@
+# Ignore MCP private configs
+mcp/.env
+mcp/firebaseKey.json
+mcp/usage.json
+node_modules/
