@@ -19,3 +19,8 @@ fs.writeFileSync(
 );
 
 console.log(`✅ 질문이 trigger.json에 저장되었습니다: "${question}"`);
+
+setTimeout(() => {
+  console.log("✅ MCP 응답 완료.");
+  process.exit(0);
+}, 1000);
