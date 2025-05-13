@@ -56,7 +56,7 @@ handler.on('push', event => {
   console.log(`📦 Push received from: ${repo}`);
 
   // Git pull 후 pm2 재시작
-  exec('cd /home/casnice/macService && git pull && pm2 restart webhook-listener', (err, stdout, stderr) => {
+  exec('cd /home/casnice/macService && git pull && pm2 restart webhook-listener && pm2 restart mcp-core', (err, stdout, stderr) => {
     if (err) {
       console.error('❌ Error:', err.message);
       return;
